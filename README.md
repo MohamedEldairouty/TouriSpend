@@ -94,7 +94,7 @@ MAE = (1/n) * Σ | yᵢ - ŷᵢ |
 | Name                          | Registration No. |
 |-------------------------------|------------------|
 | [@Mohamed Abdallah Eldairouty](https://github.com/MohamedEldairouty)  | 221001719 |  
-| Rimas Emad    | 221001067         | 
+| [@Rimas Emad](https://github.com/rimaseldib)    | 221001067         | 
 | Moaz Aly      | 221001970         | 
 | Jasmine Ashraf | 221000990        | 
 
