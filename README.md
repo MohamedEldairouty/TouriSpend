@@ -89,7 +89,7 @@ MAE = (1/n) * Σ | yᵢ - ŷᵢ |
 
 ---
 
-## 👥 Team Members
+## 👥 Team TouriSpend Members
 
 | Name                          | Registration No. |
 |-------------------------------|------------------|
