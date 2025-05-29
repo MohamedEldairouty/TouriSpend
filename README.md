@@ -70,8 +70,9 @@ MAE = (1/n) * Σ | yᵢ - ŷᵢ |
 ## 🤖 Model Implementation
 
 ✅ We used:
-- **CatBoostRegressor** with `Quantile:alpha=0.5` loss for robustness
-- Feature engineering (ratios, groupings, binary flags)
+- **CatBoostRegressor** with `Quantile:alpha=0.6` loss for robustness against outliers
+- StratifiedKFold based on cost quantiles
+- Extensive feature engineering: binary flags, ratios, age × nights
 - Early stopping + clipping for final output
 
 ---
@@ -82,10 +83,10 @@ MAE = (1/n) * Σ | yᵢ - ŷᵢ |
 |-----------------------|------------------|
 | Raw model             | ~8.6M            |
 | After preprocessing   | ~5.0M            |
-| Final CatBoost        | **~3.3M**   |
+| Final CatBoost        | **~3.3M**        |
 
-🏆 **Zindi Leaderboard Rank:** 79th out of 291  
-📈 **Percentile:** Top 27%
+🏆 **Zindi Leaderboard Rank:** 41st out of 294  
+📈 **Percentile:** Top **13.9%**
 
 ---
 
