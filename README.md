@@ -107,7 +107,7 @@ MAE = (1/n) * Σ | yᵢ - ŷᵢ |
 | After preprocessing   | ~5.0M            |
 | Final CatBoost        | **~3.3M**        |
 
-🏆 **Zindi Leaderboard Rank:** 39th out of 296  
+🏆 **Zindi Leaderboard Rank:** 39th out of 297  
 📈 **Percentile:** Top **13%**
 
 ---
