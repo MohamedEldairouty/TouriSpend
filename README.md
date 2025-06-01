@@ -10,7 +10,7 @@
 
 ## 📌 Introduction
 
-**TouriSpend** aims to predict how much a tourist will spend when visiting Tanzania, based on personal, behavioral, and trip-related features. Our model leverages gradient boosting (CatBoost) and well-structured preprocessing to achieve robust performance.
+**TouriSpend** aims to predict how much a tourist will spend when visiting Tanzania, based on personal, behavioral, and trip-related features. Our model leverages gradient boosting (CatBoost) and thorough preprocessing to achieve competitive results.
 
 ---
 
@@ -21,7 +21,7 @@ Tourism is one of Tanzania's key economic sectors. Accurate cost prediction help
 - Businesses plan offers and logistics
 - Improve tourist experience
 
-Our goal: **Build a model with minimal error (MAE) on test data submitted to Zindi**.
+Our goal: **Build a model with minimal error (MAE) on test data submitted to Zindi.**
 
 ---
 
@@ -46,39 +46,96 @@ MAE = (1/n) * Σ | yᵢ - ŷᵢ |
 
 ---
 
-## ⚙️ Data Processing
+## ⚙️ Data Preprocessing
 
 ✅ Handled:
-- Missing values (mode for categoricals, 0 for numerics)
-- Outliers: target (`total_cost`) clipped at 25M max
-- Log-transformation of target: `log1p(total_cost)`
+- Missing values: imputed using mode (categoricals) and zeros (numericals)
+- Clipping outliers: capped `total_cost` at 25 million
+- Target transformation: `log1p(total_cost)` to reduce skewness
 - Feature engineering:
-  - `people_x_nights` = total_people × total_nights
-  - `nights_per_person` = total_nights ÷ total_people
-  - `people_x_mainland`, `people_x_zanzibar`
-  - Binary indicators like `has_spouse`, `has_children`, `solo_traveler`
-  - Region grouping based on country
+  - Ratios and interactions: `people_x_nights`, `people_x_mainland`, `nights_per_person`, etc.
+  - Binary indicators: `has_spouse`, `has_children`, `solo_traveler`
+  - Categorical simplification: `region` mapping from `country`
+  - Target Encoding: `country_te`, `activity_te`, `payment_te`
 
 ---
 
-## 📊 Data Exploration (EDA)
+## 📊 Data Exploration & Visualization
 
-🔍 We explored:
-- Distributions of spend across country, activity, and age
-- Relationships between nights stayed and cost
-- Outlier distribution in target
+We analyzed the data before modeling using EDA techniques:
 
-📊 *(see `notebooks/final_model.ipynb` for visualizations)*
+### 🔹 Target Distribution
+- Raw total cost was heavily right-skewed
+- Log-transformed version is nearly normal
+
+<p float="left">
+  <img src="assets/Histogram of Total Cost (Raw).png" width="360"/>
+  <img src="assets/Histogram of log (Total Cost +1).png" width="360"/>
+</p>
+
+### 🔹 Feature Distributions
+
+<p float="left">
+  <img src="assets/Distribution of night mainland.png" width="270"/>
+  <img src="assets/Distribution of night zanzibar.png" width="270"/>
+  <img src="assets/Distribution of total female.png" width="270"/>
+  <img src="assets/Distribution of total male.png" width="270"/>
+</p>
+
+### 🔹 Categorical Insights
+
+<p float="left">
+  <img src="assets/top categ in country.png" width="280"/>
+  <img src="assets/top categ in age group.png" width="280"/>
+  <img src="assets/top categ in main_activity.png" width="280"/>
+  <img src="assets/top categ in info source.png" width="280"/>
+  <img src="assets/top categ in purpose.png" width="280"/>
+  <img src="assets/top categ in travel with.png" width="280"/>
+  <img src="assets/top categ in payment mode.png" width="280"/>
+</p>
+
+---
+
+## 🧬 PCA Analysis
+
+To understand the feature space:
+
+### 🔹 Cumulative Explained Variance
+
+<img src="assets/comulative explained variance.png" width="480"/>
+
+➡️ **95% variance** was retained with 10 components.
+
+### 🔹 PCA Projection (2D)
+
+<img src="assets/pca projection.png" width="400"/>
+
+This helped us visually assess how quantiles of `log_total_cost` spread across feature space.
+
+---
+
+## 📈 Feature Relationships
+
+We visualized key scatter plots between target and engineered features:
+
+<p float="left">
+  <img src="assets/log total cost vs night mainland.png" width="300"/>
+  <img src="assets/log total cost vs night zanzibar.png" width="300"/>
+  <img src="assets/log total cost vs total female.png" width="300"/>
+  <img src="assets/log total cost vs total male.png" width="300"/>
+  <img src="assets/log total cost vs nights per person.png" width="300"/>
+  <img src="assets/log total cost vs people x nights.png" width="300"/>
+</p>
 
 ---
 
 ## 🤖 Model Implementation
 
 ✅ We used:
-- **CatBoostRegressor** with `Quantile:alpha=0.6` loss for robustness against outliers
-- Extensive feature engineering: binary flags, region grouping, ratios, cross-features
-- StratifiedKFold (5-fold) based on cost bins (`pd.qcut(total_cost, 5)`)
-- Clipping predictions in final output for stability
+- **CatBoostRegressor** with `Quantile:alpha=0.6` loss for robustness
+- StratifiedKFold (5-fold) based on cost bins using `pd.qcut`
+- No log transform on features, only the target
+- Post-inference clipping for stability
 
 ---
 
@@ -89,10 +146,10 @@ MAE = (1/n) * Σ | yᵢ - ŷᵢ |
 | Model             | CatBoostRegressor  |
 | Loss Function     | Quantile:alpha=0.6 |
 | Depth             | 9                  |
-| Learning Rate     | 0.024              |
-| Iterations        | 1700               |
-| L2 Leaf Reg       | 7                  |
-| Subsample         | 0.83               |
+| Learning Rate     | 0.022              |
+| Iterations        | 1750               |
+| L2 Leaf Reg       | 6                  |
+| Subsample         | 0.85               |
 | Early Stopping    | 100 rounds         |
 | CV Strategy       | StratifiedKFold (5-fold) on cost bins |
 | Prediction Clipping | [50,000, 25,000,000] |
@@ -103,12 +160,13 @@ MAE = (1/n) * Σ | yᵢ - ŷᵢ |
 
 | Stage                 | MAE (Validation) |
 |-----------------------|------------------|
-| Raw model             | ~8.6M            |
+| Raw baseline          | ~8.6M            |
 | After preprocessing   | ~5.0M            |
-| Final CatBoost        | **~3.3M**        |
+| **Final CatBoost**    | **3.35M** |
 
-🏆 **Zindi Leaderboard Rank:** 39th out of 297  
-📈 **Percentile:** Top **13%**
+🏆 **Zindi Leaderboard Rank:** **27th out of 302**  
+📉 **Leaderboard Score (MAE):** **4,862,550.945**
+📈 **Percentile:** Top **8.9%**
 
 ---
 
@@ -126,26 +184,24 @@ MAE = (1/n) * Σ | yᵢ - ŷᵢ |
 ## 🚀 Project Deliverables Checklist
 
 - [x] Data Processing (missing values, outliers, transforms)
-- [x] Handle challenges (categorical explosion, cost skew)
-- [x] Data Exploration (see notebook)
-- [x] Model Implementation (CatBoost with preprocessing)
-- [x] Structured Report (this README 🎯)
-- [x] Code (in `/notebooks/`)
-- [x] Predictions submitted to Zindi
+- [x] EDA with Visualizations (see `assets/` folder and notebook)
+- [x] PCA Explained Variance Analysis
+- [x] Model Implementation (CatBoost with feature engineering)
+- [x] Submission to Zindi
+- [x] Structured Report (this README ✅)
+- [x] Jupyter Notebook with all code and outputs
 
 ---
 
-## 📦 How to Run
+## 💻 How to Run
 
 ```bash
 git clone https://github.com/MohamedEldairouty/TouriSpend.git 
 cd TouriSpend
 pip install -r requirements.txt
 jupyter notebook notebooks/final_model.ipynb
+
 ```
 ---
-
-## 🏁 Final Notes
-This project was developed as part of a Machine Learning competition hosted on Zindi. All work was completed by our team using open-source tools and documented clearly for reproducibility.
 
 <p align="center"> 🚀 Powered by CatBoost • Crafted with ❤️ by Team TouriSpend </p>
