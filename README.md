@@ -164,8 +164,8 @@ We visualized key scatter plots between target and engineered features:
 | After preprocessing   | ~5.0M            |
 | **Final CatBoost**    | **3.35M** |
 
-🏆 **Zindi Leaderboard Rank:** **27th out of 302**  
-📉 **Leaderboard Score (MAE):** **4,862,550.945**
+🏆 **Zindi Leaderboard Rank:** **27th out of 302**          
+📉 **Leaderboard Score (MAE):** **4,862,550.945**         
 📈 **Percentile:** Top **8.9%**
 
 ---
